@@ -287,7 +287,7 @@ GameObject:
   - component: {fileID: 266395070}
   m_Layer: 12
   m_Name: Cube (1)
-  m_TagString: Untagged
+  m_TagString: Pared
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -861,7 +861,7 @@ GameObject:
   - component: {fileID: 1036837439}
   m_Layer: 12
   m_Name: Cube (3)
-  m_TagString: Untagged
+  m_TagString: Pared
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -998,6 +998,11 @@ MonoBehaviour:
   distanciaPlayer: 0
   rollSpeed: 25
   walkSpeed: 10
+  animator: {fileID: 8075260367552037276}
+  impactFX: {fileID: 3432958286849152088, guid: 87ee7299dd44ed747af24dbb91bcd33b, type: 3}
+  materials:
+  - {fileID: 2100000, guid: 65c15cc6af2e3bb489c29393020f68f3, type: 2}
+  - {fileID: 2100000, guid: e885dc4b13c566d41bc0c5ddb1ba4801, type: 2}
   puntosRef:
   - {fileID: 820258959}
   - {fileID: 810966437}
@@ -1022,8 +1027,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.58, y: 0.7, z: 1}
+  m_Center: {x: 0, y: -0.44, z: 0}
 --- !u!23 &1083841355
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1398,7 +1403,7 @@ GameObject:
   - component: {fileID: 1269691794}
   m_Layer: 12
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: Pared
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1773,6 +1778,10 @@ PrefabInstance:
       propertyPath: m_LocalRotation.y
       value: -0.30420613
       objectReference: {fileID: 0}
+    - target: {fileID: 575912915671339336, guid: 3786423ec1ea68d46ae65f6ee281e6a1, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 626736256931217346, guid: 3786423ec1ea68d46ae65f6ee281e6a1, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.9999998
@@ -1904,6 +1913,10 @@ PrefabInstance:
     - target: {fileID: 1269469860189899694, guid: 3786423ec1ea68d46ae65f6ee281e6a1, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.1348887
+      objectReference: {fileID: 0}
+    - target: {fileID: 1777258275853772409, guid: 3786423ec1ea68d46ae65f6ee281e6a1, type: 3}
+      propertyPath: m_TagString
+      value: Punch
       objectReference: {fileID: 0}
     - target: {fileID: 1867588146588806733, guid: 3786423ec1ea68d46ae65f6ee281e6a1, type: 3}
       propertyPath: m_LocalRotation.w

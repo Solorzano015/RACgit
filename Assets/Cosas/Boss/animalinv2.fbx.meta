@@ -118,11 +118,11 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: MuertolinV01
+      name: "Da\xF1o"
       takeName: MuertolinV01
       internalID: 1842872911885077031
       firstFrame: 0
-      lastFrame: 185
+      lastFrame: 19
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

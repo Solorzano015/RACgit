@@ -1,4 +1,7 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
 
 public class bossBrain : MonoBehaviour
 {
@@ -14,6 +17,10 @@ public class bossBrain : MonoBehaviour
     public float distanciaPlayer;
     public float rollSpeed;
     public float walkSpeed=5;
+    public Animator animator;
+    public GameObject impactFX;
+
+    public List<Material> materials;
 
 
     public Transform[] puntosRef;
@@ -40,5 +47,40 @@ public class bossBrain : MonoBehaviour
         Debug.DrawRay(transform.position, -transform.up * 100, Color.yellow);
     }
     
+    public void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Punch")
+        {
+            animator.SetTrigger("GetHit");
+            Vector3 puntoDeContacto = other.ClosestPoint(transform.position);
+            GameObject g = Instantiate(impactFX, puntoDeContacto, Quaternion.identity);
+            StartCoroutine(CambiarColor());
+            Destroy(g, 1f);
+        } 
+    }
 
+    public void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.tag == "Pared")
+        {
+            ContactPoint contacto = other.GetContact(0);
+            Vector3 puntoDeContacto = contacto.point;
+            GameObject g = Instantiate(impactFX, puntoDeContacto, Quaternion.identity);
+            StartCoroutine(CambiarColor());
+            //Destroy(g, 1f);
+        }
+    }
+
+    IEnumerator CambiarColor()
+    {
+        foreach (var item in materials)
+        {
+            item.color = Color.red;
+        }
+        yield return new WaitForSeconds(0.5f);
+        foreach (var item in materials)
+        {
+            item.color = Color.white;
+        }
+    }
 }
