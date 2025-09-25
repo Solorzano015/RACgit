@@ -19,6 +19,8 @@ public class bossBrain : MonoBehaviour
     public float walkSpeed=5;
     public Animator animator;
     public GameObject impactFX;
+    public int bossVidas;
+    public int bossMaxVidas=3;
 
     public List<Material> materials;
 
@@ -37,7 +39,7 @@ public class bossBrain : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        bossVidas = bossMaxVidas;
     }
 
     // Update is called once per frame
@@ -52,6 +54,8 @@ public class bossBrain : MonoBehaviour
         if (other.gameObject.tag == "Punch")
         {
             animator.SetTrigger("GetHit");
+            bossVidas -= 1;
+            //mecanica de muerte?
             Vector3 puntoDeContacto = other.ClosestPoint(transform.position);
             GameObject g = Instantiate(impactFX, puntoDeContacto, Quaternion.identity);
             StartCoroutine(CambiarColor());
