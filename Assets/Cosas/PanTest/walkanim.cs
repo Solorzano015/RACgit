@@ -40,10 +40,10 @@ public class walkanim : StateMachineBehaviour
 
 
 
-            Boss.transform.position = Vector3.MoveTowards(Boss.transform.position, posicionInPlayer, bossBrain.instance.walkSpeed * Time.deltaTime);
+            Vector3 posOb = Vector3.MoveTowards(Boss.transform.position, posicionInPlayer, bossBrain.instance.walkSpeed * Time.deltaTime);
             Boss.transform.rotation = Quaternion.LookRotation(Vector3.up, Boss.transform.position - posicionInPlayer);
 
-
+            Boss.transform.position = new Vector3(posOb.x, Boss.transform.position.y, posOb.z);
 
             if (distanciaPlayer < bossBrain.instance.distAtt)
             {
@@ -68,10 +68,10 @@ public class walkanim : StateMachineBehaviour
 
 
 
-            Boss.transform.position = Vector3.MoveTowards(Boss.transform.position, posicionInPlayer, bossBrain.instance.walkSpeed * Time.deltaTime);
+            Vector3 posOb = Vector3.MoveTowards(Boss.transform.position, posicionInPlayer, bossBrain.instance.walkSpeed * Time.deltaTime);
             Boss.transform.rotation = Quaternion.LookRotation(Vector3.up, Boss.transform.position - posicionInPlayer);
 
-
+            Boss.transform.position = new Vector3(posOb.x, Boss.transform.position.y, posOb.z);
 
             if (distanciaPlayer <= 2)
             {

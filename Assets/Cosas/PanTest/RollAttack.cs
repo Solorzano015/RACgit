@@ -37,7 +37,7 @@ public class RollAttack : StateMachineBehaviour
         {
             posicionInPlayer=hit.point;
 
-
+            posicionInPlayer.y = Boss.transform.position.y;
             Debug.Log("Impacto en: " + hit.point);
         }
 
@@ -55,7 +55,9 @@ public class RollAttack : StateMachineBehaviour
 
         if (bossBrain.instance.follow == true)
         {
-            Boss.transform.position = Vector3.MoveTowards(Boss.transform.position, posicionInPlayer, bossBrain.instance.rollSpeed * Time.deltaTime);
+            Vector3 posOb = Vector3.MoveTowards(Boss.transform.position, posicionInPlayer, bossBrain.instance.rollSpeed * Time.deltaTime);
+            //posOb.y= Boss.transform.position.y;
+            Boss.transform.position = new Vector3(posOb.x, Boss.transform.position.y, posOb.z);
 
             distanciaPlayer = Vector3.Distance(Boss.transform.position, posicionInPlayer);
 

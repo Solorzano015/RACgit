@@ -19,8 +19,10 @@ public class bossBrain : MonoBehaviour
     public float walkSpeed=5;
     public Animator animator;
     public GameObject impactFX;
+    public GameObject impactFXPared;
     public int bossVidas;
     public int bossMaxVidas=3;
+    public bool canGetHit;
 
     public List<Material> materials;
 
@@ -40,6 +42,7 @@ public class bossBrain : MonoBehaviour
     void Start()
     {
         bossVidas = bossMaxVidas;
+        canGetHit = true;
     }
 
     // Update is called once per frame
@@ -51,29 +54,54 @@ public class bossBrain : MonoBehaviour
     
     public void OnTriggerEnter(Collider other)
     {
+        if (bossVidas <= 0 || canGetHit==false)
+        {
+
+            return;
+
+        }
+
+
         if (other.gameObject.tag == "Punch")
         {
             animator.SetTrigger("GetHit");
+            canGetHit = false;
             bossVidas -= 1;
-            //mecanica de muerte?
+
+            if (bossVidas <= 0)
+            {
+
+                animator.SetTrigger("Dead");
+                
+
+            }
+
             Vector3 puntoDeContacto = other.ClosestPoint(transform.position);
             GameObject g = Instantiate(impactFX, puntoDeContacto, Quaternion.identity);
             StartCoroutine(CambiarColor());
             Destroy(g, 1f);
-        } 
-    }
+        }
 
-    public void OnCollisionEnter(Collision other)
-    {
         if (other.gameObject.tag == "Pared")
         {
-            ContactPoint contacto = other.GetContact(0);
-            Vector3 puntoDeContacto = contacto.point;
-            GameObject g = Instantiate(impactFX, puntoDeContacto, Quaternion.identity);
-            StartCoroutine(CambiarColor());
-            //Destroy(g, 1f);
+            Vector3 puntoDeContacto = other.ClosestPoint(transform.position);
+            GameObject g = Instantiate(impactFXPared, puntoDeContacto, Quaternion.identity);
+            //StartCoroutine(CambiarColor());
+            Destroy(g, 1f);
         }
     }
+
+    //public void OnCollisionEnter(Collision other)
+    //{
+    //    if (other.gameObject.tag == "Pared")
+    //    {
+    //        ContactPoint contacto = other.GetContact(0);
+    //        Vector3 puntoDeContacto = contacto.point;
+    //        GameObject g = Instantiate(impactFX, puntoDeContacto, Quaternion.identity);
+    //        StartCoroutine(CambiarColor());
+    //        //Destroy(g, 1f);
+    //    }
+    //}
 
     IEnumerator CambiarColor()
     {
@@ -85,6 +113,9 @@ public class bossBrain : MonoBehaviour
         foreach (var item in materials)
         {
             item.color = Color.white;
+
         }
+
+        canGetHit = true;
     }
 }
