@@ -16,13 +16,20 @@ public class bossBrain : MonoBehaviour
     public float distWalk = 6;
     public float distanciaPlayer;
     public float rollSpeed;
-    public float walkSpeed=5;
+    public float walkSpeed = 5;
     public Animator animator;
     public GameObject impactFX;
     public GameObject impactFXPared;
     public int bossVidas;
-    public int bossMaxVidas=3;
+    public int bossMaxVidas = 3;
     public bool canGetHit;
+    public GameObject camaraEntrada;
+    public Renderer renderLife;
+    public Color [] colorCresta;
+    public Material mat;
+    public float intensidad;
+    public float intensidad1;
+    public float intensidad0;
 
     public List<Material> materials;
 
@@ -45,13 +52,44 @@ public class bossBrain : MonoBehaviour
         canGetHit = true;
     }
 
+    private void OnEnable()
+    {
+        Invoke("IniciarBatalla", 3);
+    }
+
     // Update is called once per frame
     void Update()
     {
 
         Debug.DrawRay(transform.position, -transform.up * 100, Color.yellow);
+        
+        if (bossVidas==3)
+        {
+            mat.SetColor("_EmissionColor", colorCresta[0] * intensidad);
+        }
+
+        if (bossVidas == 2)
+        {
+            mat.SetColor("_EmissionColor", colorCresta[1] * intensidad0);
+        }
+
+        if (bossVidas == 1)
+        {
+            mat.SetColor("_EmissionColor", colorCresta[2] * intensidad1);
+        }
+
+        if (bossVidas == 0)
+        {
+            mat.SetColor("_EmissionColor", colorCresta[3] * 0);
+        }
+
     }
-    
+
+    public void IniciarBatalla()
+    {
+        camaraEntrada.SetActive(false);
+        animator.SetTrigger("Entrada");
+    }
     public void OnTriggerEnter(Collider other)
     {
         if (bossVidas <= 0 || canGetHit==false)

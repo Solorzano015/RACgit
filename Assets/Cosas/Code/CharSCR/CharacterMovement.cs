@@ -65,6 +65,10 @@ public class CharacterMovement : MonoBehaviour
         {
             Debug.LogError("No se asignó el GroundChecker en " + gameObject.name);
         }
+
+        Cursor.visible=false;
+        Cursor.lockState = CursorLockMode.Locked;
+
     }
 
     void Update()
