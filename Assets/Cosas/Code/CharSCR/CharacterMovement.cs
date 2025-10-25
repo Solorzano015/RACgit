@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody))]
 public class CharacterMovement : MonoBehaviour
@@ -55,6 +56,15 @@ public class CharacterMovement : MonoBehaviour
 
     private Rigidbody rb;
 
+    public Vector2 controlAxis;
+
+
+    public void OnMove(InputValue value)
+    {
+
+        controlAxis = value.Get<Vector2>();
+
+    }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -100,10 +110,33 @@ public class CharacterMovement : MonoBehaviour
 
     void HandleMovement()
 {
-    // Leer input
-    float inputX = (Input.GetKey(leftKey) ? -1f : 0f) + (Input.GetKey(rightKey) ? 1f : 0f);
-    float inputZ = (Input.GetKey(forwardKey) ? 1f : 0f) + (Input.GetKey(backwardKey) ? -1f : 0f);
-    Vector3 inputDir = new Vector3(inputX, 0, inputZ);
+        // Leer input
+        float inputX;
+        float inputZ;
+
+        if (controlAxis!=Vector2.zero)
+        {
+
+            // Leer input
+            inputX = controlAxis.x;
+            inputZ = controlAxis.y;
+
+        }
+        else
+        {
+
+            // Leer input
+            inputX = (Input.GetKey(leftKey) ? -1f : 0f) + (Input.GetKey(rightKey) ? 1f : 0f);
+            inputZ = (Input.GetKey(forwardKey) ? 1f : 0f) + (Input.GetKey(backwardKey) ? -1f : 0f);
+
+        }
+
+
+        //// Leer input
+        //inputX = (Input.GetKey(leftKey) ? -1f : 0f) + (Input.GetKey(rightKey) ? 1f : 0f);
+        //inputZ = (Input.GetKey(forwardKey) ? 1f : 0f) + (Input.GetKey(backwardKey) ? -1f : 0f);
+
+        Vector3 inputDir = new Vector3(inputX, 0, inputZ);
     bool isWalking = inputDir.magnitude > 0.1f;
     animator.SetBool("IsWalking", isWalking);
 
