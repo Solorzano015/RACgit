@@ -59490,6 +59490,7 @@ MonoBehaviour:
   animator: {fileID: 1280974860}
   groundChecker: {fileID: 996934513}
   movementEnabled: 1
+  controlAxis: {x: 0, y: 0}
 --- !u!136 &996934516
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -59583,6 +59584,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   controlAxis: {x: 0, y: 0}
+  botonA: 0
 --- !u!1001 &996937785
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -138233,7 +138235,7 @@ MonoBehaviour:
   defaultShakeMagnitude: 5
   defaultShakeSpeed: 0.1
   rendererObject: {fileID: 7542995088674020121}
-  defaultMaterial: {fileID: 2100000, guid: 6a4e5ed6ad1b5534b9863dc368fc76b0, type: 2}
+  defaultMaterial: {fileID: 2100000, guid: 6ee5d86284fa86b48b50e44d876f1899, type: 2}
   highlightMaterial: {fileID: 2100000, guid: 6ee5d86284fa86b48b50e44d876f1899, type: 2}
 --- !u!23 &3129779574373004498
 MeshRenderer:
