@@ -1,6 +1,7 @@
 using System.Collections;
 
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
@@ -39,11 +40,20 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (!isDead && Input.GetKeyDown(KeyCode.Escape))
+        if (!isDead && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
             TogglePause();
         }
-        else if (isDead && Input.GetKeyDown(KeyCode.Escape))
+        else if (isDead && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            ReturnToMainMenu();
+        }
+
+        if (!isDead && Gamepad.current.startButton.wasPressedThisFrame)
+        {
+            TogglePause();
+        }
+        else if (isDead && Gamepad.current.startButton.wasPressedThisFrame)
         {
             ReturnToMainMenu();
         }

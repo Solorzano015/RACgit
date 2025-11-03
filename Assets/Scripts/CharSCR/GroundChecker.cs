@@ -11,7 +11,7 @@ public class GroundChecker : MonoBehaviour
     public LayerMask groundMask;
 
     // Variable para conocer si el personaje está en el suelo
-    public bool IsGrounded { get; private set; }
+    public bool IsGrounded;
 
     void Update()
     {
