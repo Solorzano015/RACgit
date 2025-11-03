@@ -132,6 +132,9 @@ public class CharacterDamage : MonoBehaviour
             UpdateLifeState();
             Die();
         }
+
+        BarradeVida.instance.vida = currentLives;
+
     }
 
     IEnumerator HurtRoutine(bool wasGrounded)

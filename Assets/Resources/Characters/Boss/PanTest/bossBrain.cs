@@ -39,6 +39,8 @@ public class bossBrain : MonoBehaviour
 
     public static bossBrain instance;
 
+    public GameObject victoria;
+
 
     public void Awake()
     {
@@ -110,6 +112,8 @@ public class bossBrain : MonoBehaviour
             {
 
                 animator.SetTrigger("Dead");
+
+                Invoke("ActivarMuerte", 4);
                 
 
             }
@@ -140,6 +144,14 @@ public class bossBrain : MonoBehaviour
     //        //Destroy(g, 1f);
     //    }
     //}
+
+    public void ActivarMuerte()
+    { 
+    
+        Time.timeScale = 0f;
+        victoria.SetActive(true);
+    
+    }
 
     IEnumerator CambiarColor()
     {

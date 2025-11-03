@@ -185,6 +185,16 @@ public class UIManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
     }
 
+
+    public void RestartGame()
+    {
+
+        int nivel = SceneManager.GetActiveScene().buildIndex;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nivel);
+
+
+    }
     // Función para revivir al jugador
     public void RevivePlayer()
 {
