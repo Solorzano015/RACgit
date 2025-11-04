@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 
 public class NPCInteractor : MonoBehaviour
 {
@@ -37,6 +38,11 @@ public class NPCInteractor : MonoBehaviour
     private bool isShaking = false;
     private Renderer npcRenderer;
     private Material originalNPCMaterial;
+
+
+
+
+    public CharacterMovement movementE;
 
 
     void Start()
@@ -129,7 +135,12 @@ public class NPCInteractor : MonoBehaviour
 
     void Update()
     {
-        if (canInteract && Input.GetKeyDown(interactionKey))
+        if (canInteract && Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            Interact();
+        }
+
+        if (canInteract && Gamepad.current.buttonSouth.wasPressedThisFrame)
         {
             Interact();
         }
@@ -144,6 +155,9 @@ public class NPCInteractor : MonoBehaviour
             {
                 npcRenderer.material = highlightMaterial; // Cambiar al material de highlight al entrar
             }
+
+
+
         }
     }
 
@@ -168,11 +182,15 @@ public class NPCInteractor : MonoBehaviour
             {
                 npcRenderer.material = defaultMaterial;
             }
+
+
+
         }
     }
 
     void Interact()
     {
+
         // Activar el Animator
         if (headAnimator != null && !headAnimator.enabled)
         {

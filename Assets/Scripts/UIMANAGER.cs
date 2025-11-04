@@ -1,24 +1,33 @@
 using System.Collections;
-
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
+    [Header("Referencias UI")]
     public GameObject mainMenu;    // Menú principal
     public GameObject pauseMenu;   // Menú de pausa
     public GameObject deathScreen; // Pantalla de muerte
+
+    [Header("Referencias de escena")]
     public GameObject cameraObject; // Cámara con el script "Camera Collision Follow"
     public GameObject playerObject; // Referencia al personaje
-    public float deathScreenDelay = 3.5f; // Tiempo de espera antes de mostrar la pantalla de muerte
-    public float delay = 3f; // Cambia esto al número de segundos que necesites
 
+    [Header("Tiempos")]
+    public float deathScreenDelay = 3.5f; // Espera antes de mostrar la pantalla de muerte
+    public float delay = 3f;              // Tiempo antes de cambiar de escena
 
     private bool isPaused = false;
     private bool isDead = false;
-    private MonoBehaviour cameraFollowScript; // Referencia al script de la cámara
-    private CharacterDamage characterDamage;    // Referencia al script del personaje
+
+    private MonoBehaviour cameraFollowScript;
+    private CharacterDamage characterDamage;
+
+    // Variable temporal usada solo en WebGL para invocar el cambio de escena
+#if UNITY_WEBGL
+    private string sceneToLoad;
+#endif
 
     void Start()
     {
@@ -27,49 +36,58 @@ public class UIManager : MonoBehaviour
         ShowDeathScreen(false);
 
         if (cameraObject != null)
-        {
-            // Obtiene el script específico en la cámara (asegúrate de que el nombre del script es correcto)
             cameraFollowScript = cameraObject.GetComponent("CameraCollisionFollow") as MonoBehaviour;
-        }
 
         if (playerObject != null)
-        {
             characterDamage = playerObject.GetComponent<CharacterDamage>();
-        }
     }
 
     void Update()
     {
-        if (!isDead && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            TogglePause();
-        }
-        else if (isDead && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            ReturnToMainMenu();
-        }
+        bool anyOtherMenuActive = (mainMenu != null && mainMenu.activeSelf)
+                                  || (deathScreen != null && deathScreen.activeSelf);
 
-        if (!isDead && Gamepad.current.startButton.wasPressedThisFrame)
-        {
+        if (!isDead && !anyOtherMenuActive && Keyboard.current.escapeKey.wasPressedThisFrame)
             TogglePause();
-        }
-        else if (isDead && Gamepad.current.startButton.wasPressedThisFrame)
-        {
+        else if (isDead && Keyboard.current.escapeKey.wasPressedThisFrame)
             ReturnToMainMenu();
-        }
+
+        if (!isDead && !anyOtherMenuActive && Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame)
+            TogglePause();
+        else if (isDead && Gamepad.current != null && Gamepad.current.startButton.wasPressedThisFrame)
+            ReturnToMainMenu();
 
         CheckDeathState();
     }
 
-    public void StartGame()
+    // --- Cambiar de escena de forma segura en WebGL ---
+    public void LoadSceneWithDelay(string sceneName)
     {
-        LoadSceneWithDelay("esc2"); // Cambia "esc2" por el nombre de tu escena real
+#if UNITY_WEBGL
+        sceneToLoad = sceneName;
+        Invoke(nameof(LoadSceneInvoked), delay);
+#else
+        StartCoroutine(LoadSceneAfterDelay(sceneName));
+#endif
     }
 
-    private IEnumerator LoadSceneAfterDelay()
+#if UNITY_WEBGL
+    private void LoadSceneInvoked()
+    {
+        SceneManager.LoadScene(sceneToLoad);
+    }
+#else
+    private IEnumerator LoadSceneAfterDelay(string sceneName)
     {
         yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene("esc2"); // Cambia "esc2" por el nombre real de tu escena
+        SceneManager.LoadScene(sceneName);
+    }
+#endif
+
+    // --- Funciones de botones ---
+    public void StartGame()
+    {
+        LoadSceneWithDelay("esc2");
     }
 
     public void LoadSampleScene()
@@ -83,26 +101,32 @@ public class UIManager : MonoBehaviour
         Debug.Log("Saliendo del juego...");
     }
 
-    public void ShowMainMenu(bool show)
+    public void ReturnToMainMenu()
     {
-        if (mainMenu != null)
-        {
-            mainMenu.SetActive(show);
-        }
+        Time.timeScale = 1f;
+        LoadSceneWithDelay("MM");
     }
 
+    public void RestartGame()
+    {
+        int nivel = SceneManager.GetActiveScene().buildIndex;
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nivel);
+    }
+
+    // --- Control de pausa ---
     public void TogglePause()
     {
-        if (isDead) return; // No permite pausar si el jugador está muerto
+        if (isDead) return;
+        if ((mainMenu != null && mainMenu.activeSelf) || (deathScreen != null && deathScreen.activeSelf))
+            return;
 
         isPaused = !isPaused;
         ShowPauseMenu(isPaused);
         Time.timeScale = isPaused ? 0f : 1f;
 
         if (cameraFollowScript != null)
-        {
             cameraFollowScript.enabled = !isPaused;
-        }
 
         Cursor.visible = isPaused;
         Cursor.lockState = isPaused ? CursorLockMode.None : CursorLockMode.Locked;
@@ -115,55 +139,36 @@ public class UIManager : MonoBehaviour
         Time.timeScale = 1f;
 
         if (cameraFollowScript != null)
-        {
             cameraFollowScript.enabled = true;
-        }
 
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public void ReturnToMainMenu()
+    // --- Control de pantallas ---
+    private void ShowMainMenu(bool show)
     {
-        Time.timeScale = 1f;
-        LoadSceneWithDelay("MM"); // Cambia "MM" por el nombre real de tu escena de menú principal
-        
+        if (mainMenu != null)
+            mainMenu.SetActive(show);
     }
 
     private void ShowPauseMenu(bool show)
     {
         if (pauseMenu != null)
-        {
             pauseMenu.SetActive(show);
-        }
     }
 
     private void ShowDeathScreen(bool show)
     {
         if (deathScreen != null)
-        {
             deathScreen.SetActive(show);
-        }
     }
 
-    public void LoadSceneWithDelay(string sceneName)
-    {
-        StartCoroutine(LoadSceneAfterDelay(sceneName));
-
-        
-    }
-
-    private IEnumerator LoadSceneAfterDelay(string sceneName)
-    {
-        yield return new WaitForSeconds(delay);
-        SceneManager.LoadScene(sceneName);
-    }
-
+    // --- Control de muerte y reaparición ---
     private void CheckDeathState()
     {
         if (isDead || characterDamage == null) return;
 
-        // Detecta si la variable DEAD está activa en el script CharacterDamage
         if (characterDamage.DEAD)
         {
             isDead = true;
@@ -174,58 +179,43 @@ public class UIManager : MonoBehaviour
     private void ActivateDeathScreen()
     {
         if (cameraFollowScript != null)
-        {
-            cameraFollowScript.enabled = false; // Desactiva el seguimiento de cámara tras el retraso
-        }
+            cameraFollowScript.enabled = false;
+
         ShowDeathScreen(true);
         ShowPauseMenu(false);
-        Time.timeScale = 0f; // Detiene el juego
+        Time.timeScale = 0f;
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
     }
 
-
-    public void RestartGame()
-    {
-
-        int nivel = SceneManager.GetActiveScene().buildIndex;
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(nivel);
-
-
-    }
-    // Función para revivir al jugador
     public void RevivePlayer()
-{
-    Debug.Log("Botón de revivir presionado"); // Para depuración
-
-    if (playerObject != null)
     {
-        var cd = playerObject.GetComponent<CharacterDamage>();
-        if (cd != null)
+        Debug.Log("Botón de revivir presionado");
+
+        if (playerObject != null)
         {
-            Debug.Log("Solicitud de reaparición enviada a CharacterDamage");
-            cd.respawnRequested = true; // Solicita el respawn en el script CharacterDamage
+            var cd = playerObject.GetComponent<CharacterDamage>();
+            if (cd != null)
+            {
+                Debug.Log("Solicitud de reaparición enviada a CharacterDamage");
+                cd.respawnRequested = true;
+            }
+            else
+            {
+                Debug.LogError("CharacterDamage no encontrado en el playerObject");
+            }
         }
         else
         {
-            Debug.LogError("CharacterDamage no encontrado en el playerObject");
+            Debug.LogError("playerObject no está asignado en UIManager");
         }
-    }
-    else
-    {
-        Debug.LogError("playerObject no está asignado en UIManager");
-    }
 
-    isDead = false;
-    ShowDeathScreen(false);
-    Time.timeScale = 1f;
+        isDead = false;
+        ShowDeathScreen(false);
+        Time.timeScale = 1f;
 
-    if (cameraFollowScript != null)
-    {
-        cameraFollowScript.enabled = true;
+        if (cameraFollowScript != null)
+            cameraFollowScript.enabled = true;
     }
-}
-
 }

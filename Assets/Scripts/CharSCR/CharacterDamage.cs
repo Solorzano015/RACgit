@@ -63,11 +63,11 @@ public class CharacterDamage : MonoBehaviour
     {
         UpdateLifeState();
 
-        if (respawnRequested)
-        {
-            respawnRequested = false;
-            Respawn();
-        }
+        //if (respawnRequested)
+        //{
+        //    respawnRequested = false;
+        //    Respawn();
+        //}
     }
 
     void OnCollisionEnter(Collision collision)
@@ -170,19 +170,19 @@ public class CharacterDamage : MonoBehaviour
         DisableControls();
     }
 
-    public void Respawn()
-    {
-        Debug.Log("Revivir activado");
-        currentLives = maxLives;
-        Debug.Log("Vidas restauradas a: " + currentLives);
-        UpdateLifeState();
-        animator.SetBool("DEAD", false);
-        animator.SetBool("RESPAWN", true);
-        isDead = false;
-        isImmune = true;
-        EnableControls();
-        StartCoroutine(RemoveImmunityAfterDelay());
-    }
+    //public void Respawn()
+    //{
+    //    Debug.Log("Revivir activado");
+    //    currentLives = maxLives;
+    //    Debug.Log("Vidas restauradas a: " + currentLives);
+    //    UpdateLifeState();
+    //    animator.SetBool("DEAD", false);
+    //    animator.SetBool("RESPAWN", true);
+    //    isDead = false;
+    //    isImmune = true;
+    //    EnableControls();
+    //    StartCoroutine(RemoveImmunityAfterDelay());
+    //}
 
     IEnumerator RemoveImmunityAfterDelay()
     {

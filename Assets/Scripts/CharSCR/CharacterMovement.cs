@@ -48,6 +48,7 @@ public class CharacterMovement : MonoBehaviour
 
     public bool botonA;
     public bool botonX;
+    public bool space;
     public bool LTrigger;
     public bool RTrigger;
     public bool botonStart;
@@ -72,6 +73,7 @@ public class CharacterMovement : MonoBehaviour
     private Rigidbody rb;
 
     public Vector2 controlAxis;
+
 
     public void OnMove(InputValue value)
     {
@@ -103,6 +105,16 @@ public class CharacterMovement : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetMouseButtonDown(0))
+            Lpunch = true;
+        if (Input.GetMouseButtonUp(0))
+            Lpunch = false;
+
+        if (Input.GetMouseButtonDown(1))
+            Rpunch = true;
+        if (Input.GetMouseButtonUp(1))
+            Rpunch = false;
+
         Debug.Log("jumpRESSED" + jumpPressed);
         // Actualiza la animación de "IsGrounded" según el GroundChecker.
         animator.SetBool("IsGrounded", groundChecker.IsGrounded);
@@ -111,7 +123,7 @@ public class CharacterMovement : MonoBehaviour
         {
             HandleMovement();
             HandleJump();
-            HandlePunch();
+
         }
 
         UpdateFallingAndAscendingAnimation();
@@ -129,22 +141,25 @@ public class CharacterMovement : MonoBehaviour
         if (Keyboard.current.shiftKey.isPressed)
         {
             walkPressed = false;
+            Debug.Log("walkP" + walkPressed);
         }
 
         if (Keyboard.current.shiftKey.wasReleasedThisFrame)
         {
 
             walkPressed = true;
-
+            Debug.Log("walkP" + walkPressed);
         }
 
         if (Gamepad.current.leftShoulder.isPressed)
         {
             walkPressed = false;
+            Debug.Log("walkP" + walkPressed);
         }
         if (Gamepad.current.leftShoulder.wasReleasedThisFrame)
         {
             walkPressed = true;
+            Debug.Log("walkP" + walkPressed);
         }
 
 
@@ -165,6 +180,8 @@ public class CharacterMovement : MonoBehaviour
             dashPressed = false;
         }
 
+
+
         if (Gamepad.current.leftTrigger.isPressed)
         {
             Lpunch = true;
@@ -182,6 +199,15 @@ public class CharacterMovement : MonoBehaviour
         {
             Rpunch = false;
         }
+
+
+
+        if (movementEnabled)
+        {
+            HandlePunch();
+        }
+
+
     }
 
     void HandlePunch()
@@ -304,40 +330,33 @@ public class CharacterMovement : MonoBehaviour
 
     void HandleJump()
     {
-        
-            if (Keyboard.current.spaceKey.wasPressedThisFrame)
-            {
-                jumpPressed = true;
-            }
+        bool jumpInput = false;
 
-            if (Keyboard.current.spaceKey.wasReleasedThisFrame)
-            {
-                jumpPressed = false;
-            }
+        // Teclado
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+            jumpInput = true;
+        jumpPressed = Keyboard.current.spaceKey.isPressed;
 
-            if (Gamepad.current.buttonSouth.wasPressedThisFrame)
-            {
-                jumpPressed = true;
-            }
-            if (Gamepad.current.buttonSouth.wasReleasedThisFrame)
-            {
-                jumpPressed = false;
-            }
-
-
-        if (hasJumped == false && jumpPressed==false)
+        // Gamepad
+        if (Gamepad.current != null)
         {
-            if (jumpPressed = true && groundChecker.IsGrounded)
-            {
-                StartCoroutine(JumpRoutine());
-                isDoubleJumping = false; // Reiniciamos el estado del doble saltos
-                animator.SetBool("IsDoubleJumping", false); // Aseguramos que esté en false al iniciar un salto nuevo
-            }
-
-            HandleDoubleJump();
+            if (Gamepad.current.buttonSouth.wasPressedThisFrame)
+                jumpInput = true;
+            jumpPressed = Gamepad.current.buttonSouth.isPressed;
         }
 
+        // Salto inicial (solo una vez)
+        if (!hasJumped && groundChecker.IsGrounded && jumpInput)
+        {
+            StartCoroutine(JumpRoutine());
+            isDoubleJumping = false;
+            animator.SetBool("IsDoubleJumping", false);
+        }
+
+        HandleDoubleJump();
     }
+
+
 
 
     IEnumerator JumpRoutine()

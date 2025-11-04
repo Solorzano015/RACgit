@@ -1,57 +1,68 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public class ParticleRateController : MonoBehaviour
 {
+    [Header("Referencias")]
     [SerializeField] private ParticleSystem particleSystem;
-    [SerializeField] private Animator animator;
-    [SerializeField] private List<string> animatorParameters = new(); // Lista de parámetros
-    [SerializeField] private float minRate = 10f;
+    [SerializeField] private MonoBehaviour sourceScript; // Script que contiene walkPressed
+    [SerializeField] private string walkPressedFieldName = "walkPressed";
+    [SerializeField] private Transform objectToTrack; // Objeto que se mueve (por defecto este mismo)
+
+    [Header("Configuración de emisión")]
+    [SerializeField] private float minRate = 0f;
     [SerializeField] private float maxRate = 100f;
-    [SerializeField] private bool invertParameter = false;
+    [SerializeField] private float movementThreshold = 0.01f; // Sensibilidad del movimiento
+    [SerializeField] private float smoothSpeed = 5f;
 
     private ParticleSystem.EmissionModule emissionModule;
+    private System.Reflection.FieldInfo walkPressedField;
+    private System.Reflection.PropertyInfo walkPressedProperty;
+    private Vector3 lastPosition;
+    private float currentRate;
 
     void Start()
     {
-        if (particleSystem == null) particleSystem = GetComponent<ParticleSystem>();
-        if (animator == null) animator = GetComponent<Animator>();
+        if (particleSystem == null)
+            particleSystem = GetComponent<ParticleSystem>();
+
+        if (objectToTrack == null)
+            objectToTrack = transform;
 
         emissionModule = particleSystem.emission;
+        currentRate = minRate;
+        lastPosition = objectToTrack.position;
+
+        if (sourceScript != null)
+        {
+            var type = sourceScript.GetType();
+            walkPressedField = type.GetField(walkPressedFieldName);
+            walkPressedProperty = type.GetProperty(walkPressedFieldName);
+        }
     }
 
     void Update()
     {
-        float maxParamValue = 0f;
-
-        foreach (string param in animatorParameters)
+        // 1️⃣ Obtener el valor de walkPressed
+        bool walkPressed = false;
+        if (sourceScript != null)
         {
-            if (animator.HasParameter(param))
-            {
-                float value = animator.GetFloat(param);
-                if (value > maxParamValue)
-                    maxParamValue = value;
-            }
+            if (walkPressedField != null)
+                walkPressed = (bool)walkPressedField.GetValue(sourceScript);
+            else if (walkPressedProperty != null)
+                walkPressed = (bool)walkPressedProperty.GetValue(sourceScript);
         }
 
-        if (invertParameter)
-            maxParamValue = 1f - maxParamValue;
+        // 2️⃣ Detectar si se está moviendo
+        float distanceMoved = Vector3.Distance(objectToTrack.position, lastPosition);
+        bool isMoving = distanceMoved > movementThreshold;
+        lastPosition = objectToTrack.position;
 
-        float newRate = Mathf.Lerp(minRate, maxRate, maxParamValue);
-        emissionModule.rateOverTime = newRate;
-    }
-}
+        // 3️⃣ Activar partículas solo si ambas condiciones son verdaderas
+        bool shouldActivate = walkPressed && isMoving;
+        float targetRate = shouldActivate ? maxRate : minRate;
 
-// Extensión útil para validar si el parámetro existe en el Animator
-public static class AnimatorExtensions
-{
-    public static bool HasParameter(this Animator animator, string paramName)
-    {
-        foreach (AnimatorControllerParameter param in animator.parameters)
-        {
-            if (param.name == paramName && param.type == AnimatorControllerParameterType.Float)
-                return true;
-        }
-        return false;
+        // 4️⃣ Transición suave
+        currentRate = Mathf.Lerp(currentRate, targetRate, Time.deltaTime * smoothSpeed);
+        emissionModule.rateOverTime = currentRate;
     }
 }
